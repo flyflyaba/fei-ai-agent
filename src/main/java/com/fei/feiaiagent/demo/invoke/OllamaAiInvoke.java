@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 
 /**
  * Spring AI 框架调用 AI大模型(Ollama)
+ * 需要下载Ollama，开通11434端口
  */
-@Component
+//@Component
 public class OllamaAiInvoke implements CommandLineRunner {
 
     @Resource
     private ChatModel ollamaChatModel;
-
 
     @Override
     public void run(String... args) throws Exception {
