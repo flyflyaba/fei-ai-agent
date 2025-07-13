@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: fei-image-search-mcp-server
+  profiles:
+#    # 加载本地调用配置
+#    active: stdio
+#    # 加载远程调用配置
+    active: sse
+server:
+  port: 8127
