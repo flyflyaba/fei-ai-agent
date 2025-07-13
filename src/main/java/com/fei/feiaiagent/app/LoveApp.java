@@ -169,7 +169,7 @@ public class LoveApp {
     private ToolCallback[] allTools;
 
     /**
-     * AI 恋爱报告功能（支持调用工具）
+     * AI 旅行报告功能（支持调用工具）
      * @param message
      * @param chatId
      * @return
