@@ -1,25 +1,22 @@
 package com.fei.feiaiagent.app;
 
 import com.fei.feiaiagent.advisor.MyLoggerAdvisor;
-import com.fei.feiaiagent.advisor.ReReadingAdvisor;
 import com.fei.feiaiagent.chatmemory.FileBasedChatMemory;
-import com.fei.feiaiagent.rag.LoveAppRagCustomAdvisorFactory;
 import com.fei.feiaiagent.rag.QueryRewriter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -28,7 +25,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 
 @Component
 @Slf4j
-public class LoveApp {
+public class TravelApp {
 
     private final ChatClient chatClient;
 
@@ -45,7 +42,7 @@ public class LoveApp {
      * 初始化 ChatClient
      * @param dashscopeChatModel
      */
-    public LoveApp(ChatModel dashscopeChatModel) {
+    public TravelApp(ChatModel dashscopeChatModel) {
         // 初始化基于文件的对话记忆
         String fileDir = System.getProperty("user.dir") +"/tmp/chat-memory";
         ChatMemory chatMemory = new FileBasedChatMemory(fileDir);
@@ -86,7 +83,24 @@ public class LoveApp {
         return content;
     }
 
-    record LoveReport(String title, List<String> suggestions) {
+    /**
+     * AI 基础对话（支持多轮对话记忆，SSE流式传输）
+     * @param message
+     * @param chatId
+     * @return
+     */
+    public Flux<String> doChatByStream(String message, String chatId) {
+        return chatClient
+                .prompt()
+                .user(message)
+                // 对话时动态设定拦截器参数，比如指定对话记忆的 id 和长度
+                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                .stream()
+                .content();
+    }
+
+    record TravelReport(String title, List<String> suggestions) {
 
     }
 
@@ -96,25 +110,25 @@ public class LoveApp {
      * @param chatId
      * @return
      */
-    public LoveReport doChatWithReport(String message, String chatId) {
-        LoveReport loveReport = chatClient
+    public TravelReport doChatWithReport(String message, String chatId) {
+        TravelReport travelReport = chatClient
                 .prompt()
                 .system(SYSTEM_PROMPT + "每次对话后都要生成恋爱结果，标题为{用户名}的恋爱报告，内容为建议列表")
                 .user(message)
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
                 .call()
-                .entity(LoveReport.class);
-        log.info("loveReport: {}", loveReport);
-        return loveReport;
+                .entity(TravelReport.class);
+        log.info("travelReport: {}", travelReport);
+        return travelReport;
     }
 
     // AI 恋爱知识库问答功能
     @Resource
-    private VectorStore loveAppVectorStore;
+    private VectorStore travelAppVectorStore;
 
     @Resource
-    private Advisor loveAppRagCloudAdvisor;
+    private Advisor travelAppRagCloudAdvisor;
 
     @Resource
     private VectorStore pgVectorVectorStore;
@@ -141,20 +155,20 @@ public class LoveApp {
                 // 开启日志，便于观察效果
                 .advisors(new MyLoggerAdvisor())
 
-                // 1. 应用 RAG 知识库问答（基于本地知识库）
-                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
+//                // 1. 应用 RAG 知识库问答（基于本地知识库）
+//                .advisors(new QuestionAnswerAdvisor(travelAppVectorStore))
 
 //                // 2. 应用 RAG 检索增强服务（基于云知识库服务）
-//                .advisors(loveAppRagCloudAdvisor)
+//                .advisors(travelAppRagCloudAdvisor)
 
-//                // 3. 应用 RAG 检索增强服务（基于PgVector向量存储）
-//                .advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
+                // 3. 应用 RAG 检索增强服务（基于PgVector向量存储）
+                .advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
 
 //                // 4. 应用自定义的 RAG 检索增强服务（文档查询器 + 上下文增强器）
 //                // status 为"单身"时，检索相关文档数为0，会返回自定义提示
 //                .advisors(
-//                        LoveAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor(
-//                                loveAppVectorStore, "已婚"
+//                        TravelAppRagCustomAdvisorFactory.createTravelAppRagCustomAdvisor(
+//                                travelAppVectorStore, "已婚"
 //                        )
 //                )
 

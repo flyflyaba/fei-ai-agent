@@ -5,6 +5,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,13 +13,13 @@ import java.util.List;
 
 
 /**
- * 恋爱大师向量数据库配置（初始化基于内存的向量数据库 Bean）
+ * 旅游大师向量数据库配置（初始化基于内存的向量数据库 Bean）
  */
 @Configuration
-public class LoveAppVectorStoreConfig {
+public class TravelAppVectorStoreConfig {
 
     @Resource
-    private LoveAppDocumentLoader loveAppDocumentLoader;
+    private TravelAppDocumentLoader travelAppDocumentLoader;
 
     @Resource
     private MyTokenTextSplitter myTokenTextSplitter;
@@ -26,10 +27,10 @@ public class LoveAppVectorStoreConfig {
     @Resource
     private MyKeywordEnricher myKeywordEnricher;
     @Bean
-    VectorStore loveAppVectorStore(EmbeddingModel dashscopeEmbeddingModel) {
+    VectorStore travelAppVectorStore(EmbeddingModel dashscopeEmbeddingModel) {
         SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(dashscopeEmbeddingModel).build();
         // 加载文档
-        List<Document> documentList = loveAppDocumentLoader.loadMarkdowns();
+        List<Document> documentList = travelAppDocumentLoader.loadMarkdowns();
 
 //        // 自主切分文档
 //        List<Document> splitDocuments = myTokenTextSplitter.splitCustomized(documentList);

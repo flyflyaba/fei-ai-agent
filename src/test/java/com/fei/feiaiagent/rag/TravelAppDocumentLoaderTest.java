@@ -7,13 +7,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class LoveAppDocumentLoaderTest {
+class TravelAppDocumentLoaderTest {
 
     @Resource
-    private LoveAppDocumentLoader loveAppDocumentLoader;
+    private TravelAppDocumentLoader travelAppDocumentLoader;
 
     @Test
     void loadMarkdowns() {
-        loveAppDocumentLoader.loadMarkdowns();
+        travelAppDocumentLoader.loadMarkdowns();
     }
 }

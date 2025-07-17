@@ -16,14 +16,14 @@ spring:
         model: gemma3:1b
     mcp:
       client:
-#        # 远程调用
-#        sse:
-#          connections:
-#            server1:
-#              url: http://localhost:8127
-        # 本地调用
-        stdio:
-          servers-configuration: classpath:mcp-servers.json
+        # 远程调用
+        sse:
+          connections:
+            server1:
+              url: http://localhost:8127
+#        # 本地调用
+#        stdio:
+#          servers-configuration: classpath:mcp-servers.json
 #    vectorstore:
 #      pgvector:
 #      index-type: HNSW
@@ -59,4 +59,3 @@ knife4j:
 ## searchAPI(application-local.yml中已配置)
 #search-api:
 #  api-key:
-
